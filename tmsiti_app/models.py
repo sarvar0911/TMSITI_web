@@ -40,3 +40,25 @@ class OrganizationalStructure(AbstractBaseModel):
 
     def __str__(self):
         return self.name
+
+
+class Contact(AbstractBaseModel):
+    full_name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    message = models.TextField()
+    appeal_type = models.CharField(max_length=255)
+    file_upload = models.FileField(upload_to='uploads/')
+
+
+class Fund(AbstractBaseModel):
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=10)
+    year = models.IntegerField()
+    description = models.TextField()
+
+
+class BuildingRegulations(AbstractBaseModel):
+    code = models.CharField(max_length=10)
+    name = models.CharField(max_length=255)
+    document = models.FileField(upload_to='building_regulations/')
