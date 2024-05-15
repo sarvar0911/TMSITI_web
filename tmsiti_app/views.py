@@ -1,13 +1,14 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, generics
 from tmsiti_app.models import (News, Announcements,
                                CEOs, OrganizationalStructure,
                                Contact, Fund,
-                               BuildingRegulations)
+                               BuildingRegulations, Word, Subsystem, Group)
 from .filters import FundPagination
 from .serializers import (NewsSerializer, AnnouncementsSerializer,
                           CEOsSerializer, OrganizationalStructureSerializer,
                           ContactSerializer, FundSerializer,
-                          BuildingRegulationSerializer)
+                          BuildingRegulationSerializer, WordSerializer,
+                          SubsystemSerializer, GroupSerializer,)
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -61,3 +62,35 @@ class FundViewSet(viewsets.ModelViewSet):
 class BuildingRegulationViewSet(viewsets.ModelViewSet):
     queryset = BuildingRegulations.objects.all()
     serializer_class = BuildingRegulationSerializer
+
+
+class WordList(generics.ListCreateAPIView):
+    queryset = Word.objects.all()
+    serializer_class = WordSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['word', 'language']
+
+
+class WordDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Word.objects.all()
+    serializer_class = WordSerializer
+
+
+class SubsystemListCreate(generics.ListCreateAPIView):
+    queryset = Subsystem.objects.all()
+    serializer_class = SubsystemSerializer
+
+
+class SubsystemRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Subsystem.objects.all()
+    serializer_class = SubsystemSerializer
+
+
+class GroupListCreate(generics.ListCreateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+
+
+class GroupRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer

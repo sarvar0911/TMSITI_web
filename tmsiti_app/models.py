@@ -62,3 +62,37 @@ class BuildingRegulations(AbstractBaseModel):
     code = models.CharField(max_length=10)
     name = models.CharField(max_length=255)
     document = models.FileField(upload_to='building_regulations/')
+
+
+class Word(models.Model):
+    UZBEK = 'uz'
+    RUSSIAN = 'ru'
+    ENGLISH = 'en'
+    TURKISH = 'tr'
+
+    LANGUAGE_CHOICES = [
+        (UZBEK, 'Uzbek'),
+        (RUSSIAN, 'Russian'),
+        (ENGLISH, 'English'),
+        (TURKISH, 'Turkish'),
+    ]
+
+    word = models.CharField(max_length=100)
+    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES)
+
+
+class Subsystem(models.Model):
+    code = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class Group(models.Model):
+    code = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    subsystem = models.ForeignKey(Subsystem, on_delete=models.CASCADE, related_name='groups')
+
+    def __str__(self):
+        return self.name
