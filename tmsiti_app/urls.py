@@ -3,8 +3,9 @@ from rest_framework import routers
 from .views import (NewsViewSet, AnnouncementsViewSet, CEOsViewSet,
                     OrganizationalStructureViewSet, ContactViewSet,
                     FundViewSet, BuildingRegulationViewSet,
-                    WordList, WordDetail, SubsystemListCreate, SubsystemRetrieveUpdateDestroy, GroupListCreate,
-                    GroupRetrieveUpdateDestroy, )
+                    WordList, WordDetail, SubsystemListCreate,
+                    SubsystemRetrieveUpdateDestroy, GroupListCreate,
+                    GroupRetrieveUpdateDestroy, RatingViewSet)
 
 router = routers.DefaultRouter()
 router.register(r'news', NewsViewSet)
@@ -24,5 +25,7 @@ urlpatterns += [
     path('subsystems/<int:pk>/', SubsystemRetrieveUpdateDestroy.as_view(), name='subsystem-detail'),
     path('groups/', GroupListCreate.as_view(), name='group-list'),
     path('groups/<int:pk>/', GroupRetrieveUpdateDestroy.as_view(), name='group-detail'),
+    path('rating/<int:product_pk>/', RatingViewSet.as_view({'get': 'list', 'post': 'create'}),
+         name='rating-list'),
 
 ]

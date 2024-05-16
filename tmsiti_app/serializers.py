@@ -1,7 +1,8 @@
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from tmsiti_app.models import News, Announcements, CEOs, OrganizationalStructure, Contact, Fund, BuildingRegulations, \
-    Word, Group, Subsystem
+    Word, Group, Subsystem, Rating
 
 
 class NewsSerializer(ModelSerializer):
@@ -64,3 +65,15 @@ class SubsystemSerializer(ModelSerializer):
     class Meta:
         model = Subsystem
         fields = ['id', 'code', 'name', 'groups']
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ["id", "rating"]
+
+    def create(self, validated_data):
+        product_id = self.context["product_id"]
+        user_id = self.context["user_id"]
+        rating = Rating.objects.create(product_id=product_id, user_id=user_id, **self.validated_data)
+        return rating

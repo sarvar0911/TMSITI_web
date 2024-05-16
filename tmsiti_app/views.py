@@ -1,14 +1,17 @@
-from rest_framework import viewsets, filters, generics
+from rest_framework import viewsets, filters, generics, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
 from tmsiti_app.models import (News, Announcements,
                                CEOs, OrganizationalStructure,
                                Contact, Fund,
-                               BuildingRegulations, Word, Subsystem, Group)
+                               BuildingRegulations, Word, Subsystem, Group, Rating)
 from .filters import FundPagination
 from .serializers import (NewsSerializer, AnnouncementsSerializer,
                           CEOsSerializer, OrganizationalStructureSerializer,
                           ContactSerializer, FundSerializer,
                           BuildingRegulationSerializer, WordSerializer,
-                          SubsystemSerializer, GroupSerializer,)
+                          SubsystemSerializer, GroupSerializer, RatingSerializer, )
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -94,3 +97,37 @@ class GroupListCreate(generics.ListCreateAPIView):
 class GroupRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+
+class RatingViewSet(viewsets.ModelViewSet):
+    serializer_class = RatingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        product_pk = self.kwargs.get('product_pk')
+        if product_pk is not None:
+            return Rating.objects.filter(product_id=product_pk)
+        else:
+            return Rating.objects.none()
+
+    def get_serializer_context(self):
+        user_id = self.request.user.id
+        product_id = self.kwargs.get("product_pk")
+        return {"user_id": user_id, "product_id": product_id}
+
+    def perform_create(self, serializer):
+        user_id = self.request.user.id
+        product_id = self.kwargs.get("product_pk")
+
+        # Delete any existing rating for this user and product
+        Rating.objects.filter(user_id=user_id, product_id=product_id).delete()
+
+        # Save the new rating
+        serializer.save(user_id=user_id, product_id=product_id)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
